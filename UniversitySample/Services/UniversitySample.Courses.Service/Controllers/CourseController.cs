@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using UniversitySample.Courses.Domain.Dto;
+using UniversitySample.Courses.Service.InternalService;
 
 namespace UniversitySample.Courses.Service.Controllers
 {
@@ -8,38 +9,12 @@ namespace UniversitySample.Courses.Service.Controllers
     [Route("[controller]")]
     public class CourseController : ControllerBase
     {
-        private static List<CourseDetails> _courseList = new List<CourseDetails>()
-        {
-            new CourseDetails
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test1",
-                StartDate = DateTime.Now.AddDays(-1),
-                EndDate = DateTime.Now.AddDays(30),
-                CreatedDate = DateTime.Now.AddDays(-100)
-            },
-            new CourseDetails
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test2",
-                StartDate = DateTime.Now.AddDays(-5),
-                EndDate = DateTime.Now.AddDays(50),
-                CreatedDate = DateTime.Now.AddDays(-100)
-            },
-            new CourseDetails
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test3",
-                StartDate = DateTime.Now.AddDays(-3),
-                EndDate = DateTime.Now.AddDays(40),
-                CreatedDate = DateTime.Now.AddDays(-100)
-            }
-        };
-
+        private readonly CourseProvider _provider;
         private readonly ILogger<CourseController> _logger;
 
-        public CourseController(ILogger<CourseController> logger)
+        public CourseController(CourseProvider provider, ILogger<CourseController> logger)
         {
+            _provider = provider;
             _logger = logger;
         }
 
@@ -49,7 +24,7 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult<IEnumerable<CourseDetails>> GetAll()
         {
-            return Ok(_courseList);
+            return Ok(_provider.Get());
         }
 
         [HttpGet("{id:guid}",Name = "GetById")]
@@ -58,7 +33,7 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult<CourseDetails> GetById(Guid id)
         {
-            var course = _courseList.FirstOrDefault(x => x.Id == id);
+            var course = _provider.GetById(id);
             if (course == null)
             {
                 return NotFound();
@@ -73,7 +48,7 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult<CourseDetails> GetByName(string name)
         {
-            var course = _courseList.FirstOrDefault(x => x.Name == name);
+            var course = _provider.GetByName(name);
             if (course == null)
             {
                 return NotFound();
@@ -87,7 +62,7 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult AddCourse(CourseDetails course)
         {
-            _courseList.Add(course);
+            _provider.Add(course);
             return Ok();
         }
 
@@ -97,18 +72,16 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult UpdateCourse(CourseDetails courseDto)
         {
-            var course = _courseList.FirstOrDefault(x => x.Id == courseDto.Id);
-            if (course == null)
+            try
             {
+                _provider.Update(courseDto); 
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogDebug(ex,"Element not found");
                 return NotFound();
             }
-
-            course.Name = courseDto.Name;
-            course.Description = courseDto.Description;
-            course.StartDate = courseDto.StartDate;
-            course.EndDate = courseDto.EndDate;
-
-            return Ok();
         }
 
         [HttpDelete("{id:guid}", Name = "DeleteCourse")]
@@ -117,15 +90,16 @@ namespace UniversitySample.Courses.Service.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public ActionResult DeleteCourse(Guid id)
         {
-            var course = _courseList.FirstOrDefault(x => x.Id == id);
-            if (course == null)
+            try
             {
+                _provider.Delete(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogDebug(ex, "Element not found");
                 return NotFound();
             }
-            
-            _courseList.Remove(course);
-
-            return Ok();
         }
     }
 }

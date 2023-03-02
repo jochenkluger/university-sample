@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.App.Server", "UniversitySample.App\Server\UniversitySample.App.Server.csproj", "{E335BA48-EBD3-49F9-9065-D03A3969DE20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.App.Server", "UniversitySample.App\Server\UniversitySample.App.Server.csproj", "{E335BA48-EBD3-49F9-9065-D03A3969DE20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.App.Client", "UniversitySample.App\Client\UniversitySample.App.Client.csproj", "{34B554DD-3504-4DC9-9010-2EC53223C8F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.App.Client", "UniversitySample.App\Client\UniversitySample.App.Client.csproj", "{34B554DD-3504-4DC9-9010-2EC53223C8F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.App.Shared", "UniversitySample.App\Shared\UniversitySample.App.Shared.csproj", "{C8DDB922-3EAC-4D85-8CF3-99A9EEDA5884}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.App.Shared", "UniversitySample.App\Shared\UniversitySample.App.Shared.csproj", "{C8DDB922-3EAC-4D85-8CF3-99A9EEDA5884}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{59F08B66-8371-42D7-B75E-DC85B21ADFA7}"
 EndProject
@@ -21,17 +21,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{D444
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Students", "Students", "{DCC11010-FE5C-4F3D-AD42-78229C9B1C53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Courses.Domain", "Services\UniversitySample.Courses.Domain\UniversitySample.Courses.Domain.csproj", "{F98D54CC-9B98-4F42-92DC-3297A2EBD312}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Courses.Domain", "Services\UniversitySample.Courses.Domain\UniversitySample.Courses.Domain.csproj", "{F98D54CC-9B98-4F42-92DC-3297A2EBD312}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Library.Domain", "Services\UniversitySample.Library.Domain\UniversitySample.Library.Domain.csproj", "{44E3BAE2-A5CC-4F2E-9E20-32F1B9D48A25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Library.Domain", "Services\UniversitySample.Library.Domain\UniversitySample.Library.Domain.csproj", "{44E3BAE2-A5CC-4F2E-9E20-32F1B9D48A25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Students.Domain", "Services\UniversitySample.Students.Domain\UniversitySample.Students.Domain.csproj", "{0B04D2FC-1532-4E2C-A0AD-583C2A7EE024}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Students.Domain", "Services\UniversitySample.Students.Domain\UniversitySample.Students.Domain.csproj", "{0B04D2FC-1532-4E2C-A0AD-583C2A7EE024}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Courses.Service", "Services\UniversitySample.Courses.Service\UniversitySample.Courses.Service.csproj", "{8978DCE2-BABC-4C52-AB50-087738070843}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Courses.Service", "Services\UniversitySample.Courses.Service\UniversitySample.Courses.Service.csproj", "{8978DCE2-BABC-4C52-AB50-087738070843}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Library.Service", "Services\UniversitySample.Library.Service\UniversitySample.Library.Service.csproj", "{C2D0B594-96B7-4108-8D2C-27DDDB05E4F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Library.Service", "Services\UniversitySample.Library.Service\UniversitySample.Library.Service.csproj", "{C2D0B594-96B7-4108-8D2C-27DDDB05E4F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Students.Service", "Services\UniversitySample.Students.Service\UniversitySample.Students.Service.csproj", "{36A31907-CB2F-4E50-A4CC-32FEA638729C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Students.Service", "Services\UniversitySample.Students.Service\UniversitySample.Students.Service.csproj", "{36A31907-CB2F-4E50-A4CC-32FEA638729C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Courses.ApiExplorer", "Services\UniversitySample.Courses.ApiExplorer\UniversitySample.Courses.ApiExplorer.csproj", "{7E174BBF-3991-48F8-888F-EDADB1137FB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{36A31907-CB2F-4E50-A4CC-32FEA638729C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36A31907-CB2F-4E50-A4CC-32FEA638729C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36A31907-CB2F-4E50-A4CC-32FEA638729C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{8978DCE2-BABC-4C52-AB50-087738070843} = {16C48CAC-98E2-4247-AF36-5A9AA2BFB8F0}
 		{C2D0B594-96B7-4108-8D2C-27DDDB05E4F2} = {D444DAB4-EA77-4058-9D1C-5A1A3E5B5F29}
 		{36A31907-CB2F-4E50-A4CC-32FEA638729C} = {DCC11010-FE5C-4F3D-AD42-78229C9B1C53}
+		{7E174BBF-3991-48F8-888F-EDADB1137FB7} = {16C48CAC-98E2-4247-AF36-5A9AA2BFB8F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {123D841A-7465-402F-93DE-B52C9C8E006A}
