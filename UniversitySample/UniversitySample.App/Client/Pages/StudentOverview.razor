@@ -1,0 +1,55 @@
+﻿@page "/studentOverview"
+@using UniversitySample.App.Shared
+@using UniversitySample.App.Client.ApiClient
+@inject HttpClient Http
+@inject StudentServiceClient StudentServiceClient
+@inject ISnackbar Snackbar
+
+<PageTitle>Student Overview</PageTitle>
+
+<h1>Student Overview</h1>
+
+<p>This is a list of all students</p>
+
+@if (students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+                <tr>
+                    <td>@student.Username</td>
+                    <td>@student.FirstName</td>
+                    <td>@student.LastName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private ICollection<StudentDetailsDto>? students;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            students = await StudentServiceClient.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add("Sorry, an error occured, please try again", Severity.Error);
+        }
+    }
+}

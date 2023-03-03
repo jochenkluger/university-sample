@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UniversitySample.Students.Domain.Dto
 {
-    public class Student
+    public class StudentDetailsDto
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; }
