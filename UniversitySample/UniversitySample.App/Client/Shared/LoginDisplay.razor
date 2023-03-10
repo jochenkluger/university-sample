@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<AuthorizeView>
+    <Authorized>
+        <MudText Color="Color">Hello @context.User.Claims.FirstOrDefault(x => x.Type == "name")?.Value!</MudText>&nbsp;
+        <MudLink @onclick="BeginSignOut" Color="Color">Log out</MudLink>
+    </Authorized>
+    <NotAuthorized>
+        <MudLink Href="authentication/login" Color="Color">Login</MudLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public Color Color { get; set; }
+
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

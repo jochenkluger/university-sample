@@ -1,0 +1,35 @@
+﻿@page "/authentication/{action}"
+
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+<RemoteAuthenticatorView Action="@Action" />
+
+@code{
+    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
+    [Parameter] public string? Action { get; set; }
+
+    //private async Task LoginSuccessCallback(RemoteAuthenticationState state)
+    //{
+    //    var authState = await AuthState;
+    //    var userId = Guid.Parse(authState.User.Claims.FirstOrDefault(x => x.Type == "sub")!.Value);
+    //    var firstname = authState.User.Claims.FirstOrDefault(x => x.Type == "given_name")?.Value;
+    //    var lastname = authState.User.Claims.FirstOrDefault(x => x.Type == "family_name")?.Value;
+    //    var email = authState.User.Claims.FirstOrDefault(x => x.Type == "email")?.Value;
+
+    //    var studentDto = new StudentDto()
+    //    {
+    //        Id = userId,
+    //        Identity = userId.ToString(),
+    //        Firstname = firstname ?? string.Empty,
+    //        Lastname = lastname ?? string.Empty,
+    //        Email = email ?? string.Empty,
+    //        LastLogin = DateTime.Now,
+    //        Number = string.Empty
+    //    };
+
+    //    var student = await _studentsClient.InitStudentAsync(studentDto);
+    //    _studentDataService.CurrentStudent = student;
+    //}
+
+}

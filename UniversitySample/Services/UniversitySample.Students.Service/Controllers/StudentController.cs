@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using UniversitySample.Students.Domain.Dto;
 using UniversitySample.Students.Service.Services;
 
@@ -22,6 +23,9 @@ namespace UniversitySample.Students.Service.Controllers
         [ProducesResponseType(typeof(IEnumerable<StudentDetailsDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [Authorize(Roles = "Administrator")]
         public ActionResult<IEnumerable<StudentDetailsDto>> GetAll()
         {
             return Ok(_service.Get());

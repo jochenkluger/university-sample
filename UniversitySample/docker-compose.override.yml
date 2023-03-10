@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+
+
+  universitysample.students.service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Server=db;Port=5432;Database=dhbw;User Id=postgres;Password=T0pS3creT;
+    ports:
+      - "5146:80"
+
+  universitysample.app.server:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8080:80"

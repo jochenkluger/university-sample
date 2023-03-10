@@ -1,0 +1,22 @@
+﻿@page "/about"
+@using Microsoft.AspNetCore.Components.Authorization
+
+<h3>About</h3>
+
+<p>Hier werden die Claims aufgelistet, die über das Token übermittelt werden.</p>
+
+<AuthorizeView>
+    <Authorized>
+        <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li>
+                    Claim Type: @claim.Type | Claim Value: @claim.Value
+                </li>
+            }
+        </ul>
+    </Authorized>
+    <NotAuthorized>
+        Nicht eingelogged - daher kein Token verfügbar
+    </NotAuthorized>
+</AuthorizeView>

@@ -33,7 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Library.Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Students.Service", "Services\UniversitySample.Students.Service\UniversitySample.Students.Service.csproj", "{36A31907-CB2F-4E50-A4CC-32FEA638729C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Courses.ApiExplorer", "Services\UniversitySample.Courses.ApiExplorer\UniversitySample.Courses.ApiExplorer.csproj", "{7E174BBF-3991-48F8-888F-EDADB1137FB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversitySample.Courses.ApiExplorer", "Services\UniversitySample.Courses.ApiExplorer\UniversitySample.Courses.ApiExplorer.csproj", "{7E174BBF-3991-48F8-888F-EDADB1137FB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitySample.Shared", "UniversitySample.Shared\UniversitySample.Shared.csproj", "{23F70324-3DFE-4D91-A3E5-46D845BEB382}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{150A165A-246C-465D-A2C7-99B2A5410CDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,14 @@ Global
 		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E174BBF-3991-48F8-888F-EDADB1137FB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23F70324-3DFE-4D91-A3E5-46D845BEB382}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23F70324-3DFE-4D91-A3E5-46D845BEB382}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23F70324-3DFE-4D91-A3E5-46D845BEB382}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23F70324-3DFE-4D91-A3E5-46D845BEB382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{150A165A-246C-465D-A2C7-99B2A5410CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{150A165A-246C-465D-A2C7-99B2A5410CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{150A165A-246C-465D-A2C7-99B2A5410CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{150A165A-246C-465D-A2C7-99B2A5410CDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +111,7 @@ Global
 		{C2D0B594-96B7-4108-8D2C-27DDDB05E4F2} = {D444DAB4-EA77-4058-9D1C-5A1A3E5B5F29}
 		{36A31907-CB2F-4E50-A4CC-32FEA638729C} = {DCC11010-FE5C-4F3D-AD42-78229C9B1C53}
 		{7E174BBF-3991-48F8-888F-EDADB1137FB7} = {16C48CAC-98E2-4247-AF36-5A9AA2BFB8F0}
+		{23F70324-3DFE-4D91-A3E5-46D845BEB382} = {C4D2EFC3-35ED-424A-A428-665C88092EB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {123D841A-7465-402F-93DE-B52C9C8E006A}

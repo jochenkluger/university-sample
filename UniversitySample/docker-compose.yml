@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=dhbw
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=T0pS3creT
+    ports:
+    - 5432:5432
+
+  universitysample.students.service:
+    image: ${DOCKER_REGISTRY-}universitysamplestudentsservice
+    build:
+      context: .
+      dockerfile: Services/UniversitySample.Students.Service/Dockerfile
+    depends_on:
+    - db
+
+  universitysample.app.server:
+    image: ${DOCKER_REGISTRY-}universitysampleappserver
+    build:
+      context: .
+      dockerfile: UniversitySample.App/Server/Dockerfile
+    depends_on:
+    - universitysample.students.service

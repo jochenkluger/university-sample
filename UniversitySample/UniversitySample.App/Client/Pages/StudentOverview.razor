@@ -1,6 +1,8 @@
-﻿@page "/studentOverview"
+﻿@attribute [Authorize(Roles="Administrator")]
+@page "/studentOverview"
 @using UniversitySample.App.Shared
 @using UniversitySample.App.Client.ApiClient
+@using Microsoft.AspNetCore.Authorization
 @inject HttpClient Http
 @inject StudentServiceClient StudentServiceClient
 @inject ISnackbar Snackbar
@@ -13,29 +15,32 @@
 
 @if (students == null)
 {
-    <p><em>Loading...</em></p>
+    <p><MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" /></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Firstname</th>
-                <th>Lastname</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in students)
-            {
-                <tr>
-                    <td>@student.Username</td>
-                    <td>@student.FirstName</td>
-                    <td>@student.LastName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    @if (students.Count > 0)
+    {
+        <MudDataGrid T="StudentDetailsDto" MultiSelection="true" Items="@students" Sortable="true" Filterable="true" Hideable="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Students</MudText>
+                <MudSpacer/>
+            </ToolBarContent>
+            <Columns>
+                <SelectColumn T="StudentDetailsDto"/>
+                <Column T="StudentDetailsDto" Field="@nameof(StudentDetailsDto.Username)" Title="Username"/>
+                <Column T="StudentDetailsDto" Field="@nameof(StudentDetailsDto.FirstName)"/>
+                <Column T="StudentDetailsDto" Field="@nameof(StudentDetailsDto.LastName)"/>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="StudentDetailsDto"/>
+            </PagerContent>
+        </MudDataGrid>
+    }
+    else
+    {
+        <p>Es sind aktuell keine Studenten vorhanden.</p>
+    }
 }
 
 @code {
