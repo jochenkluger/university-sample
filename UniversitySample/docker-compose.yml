@@ -1,0 +1,92 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=Uni
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=123
+    ports:
+    - 5432:5432
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./compose/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=jochen@kluger.net
+      - PGADMIN_DEFAULT_PASSWORD=123
+    ports:
+    - 3001:80
+
+  smtp4dev:
+    image: rnwood/smtp4dev
+    environment:
+      - TZ=Europe/Berlin
+    ports:
+    - 3000:80
+    - 25:25
+    depends_on:
+    - db
+    - rabbitmq
+
+  unisample.courses.service:
+    image: ${DOCKER_REGISTRY-}unisamplecoursesservice
+    build:
+      context: .
+      dockerfile: UniSample.Courses/UniSample.Courses.Service/Dockerfile
+    depends_on:
+    - db
+    - rabbitmq
+
+  unisample.library.service:
+    image: ${DOCKER_REGISTRY-}unisamplelibraryservice
+    build:
+      context: .
+      dockerfile: UniSample.Library/UniSample.Library.Service/Dockerfile
+    depends_on:
+    - db
+    - rabbitmq
+    - unisample.courses.service
+
+  unisample.students.service:
+    image: ${DOCKER_REGISTRY-}unisamplestudentsservice
+    build:
+      context: .
+      dockerfile: UniSample.Students/UniSample.Students.Service/Dockerfile
+    depends_on:
+    - db
+    - rabbitmq
+    - unisample.library.service
+
+  unisample.app.service:
+    image: ${DOCKER_REGISTRY-}unisampleappservice
+    build:
+      context: .
+      dockerfile: UniSample.App/UniSample.App.Service/Dockerfile
+    depends_on:
+    - unisample.courses.service
+    - unisample.library.service
+    - unisample.students.service
+
+  nginx:
+    image: nginx
+    environment:
+    - NGINX_PORT=80
+    volumes:
+    - ./compose/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+    - 8080:80
+    depends_on:
+    - unisample.courses.service
+    - unisample.library.service
+    - unisample.students.service
+    - unisample.app.service

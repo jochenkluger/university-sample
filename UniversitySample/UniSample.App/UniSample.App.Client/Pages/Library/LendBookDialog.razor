@@ -1,0 +1,67 @@
+﻿@attribute [Authorize(Roles = "Student")]
+@using Microsoft.AspNetCore.Authorization
+@using UniSample.App.Services
+@using UniSample.Library.Domain.Contract
+@using UniSample.Library.Domain.Dto
+@inject LibraryClient _libraryClient
+
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Buch ausleihen
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <p>Möchten Sie folgendes Buch ausleihen?</p>
+        <MudForm @ref="form">
+            <MudTextField @bind-Value="Book.Isbn" Label="Isbn" ReadOnly="true"/>
+            <MudTextField @bind-Value="Book.Title" Label="Titel" ReadOnly="true"/>
+            <MudTextField @bind-Value="Book.Author" Label="Autor" ReadOnly="true"/>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" OnClick="Lend">Ausleihen</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+
+    [Parameter]
+    public BookDto Book { get; set; } = new BookDto();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Lend()
+    {
+        var userId = Guid.Parse(AuthState.Result.User.Claims.FirstOrDefault(x => x.Type == "sub")!.Value);
+        var lendRequest = new LendBookRequest()
+        {
+            BookId = Book.Id,
+            Id = Guid.NewGuid(),
+            LibraryUserId = userId
+        };
+
+        var response = await _libraryClient.LendBookAsync(lendRequest);
+
+        if (response.Success == false)
+        {
+            _snackbar.Add("Fehler beim Ausleihen des Buches: " + response.Error, Severity.Error);
+            MudDialog.Close(DialogResult.Cancel());
+        }
+        else
+        {
+            _snackbar.Add("Das Buch wurde für Sie ausgeliehen", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(Book));
+        }
+    }
+}

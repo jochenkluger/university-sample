@@ -1,0 +1,58 @@
+﻿@attribute [Authorize(Roles = "Administrator")]
+@using Microsoft.AspNetCore.Authorization
+@using UniSample.App.Services
+@using UniSample.Courses.Domain.Dto
+@inject CoursesClient _coursesClient
+
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Neuen Kurs anlegen
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            @if (errors.Length > 0)
+            {
+                <MudText Typo="Typo.subtitle2">@($"Fehler: ({errors.Length})")</MudText>
+                @foreach (var error in errors)
+                {
+                    <MudText Color="@Color.Error">@error</MudText>
+                }
+            }
+
+            <MudTextField @bind-Value="Course.Id" Label="Id" ReadOnly="true" />
+            <MudTextField @bind-Value="Course.Name" Label="Name des Kurses" Required="true" RequiredError="Bitte geben Sie einen Namen für den Kurs ein!" ReadOnly="false" />
+            <MudTextField @bind-Value="Course.ProfName" Label="Name des Dozenten" Required="true" RequiredError="Bitte geben Sie den Namen des Dozenten ein!" ReadOnly="false" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" Disabled="@(!success)" OnClick="AddCourse">Kurs hinzufügen</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    [Parameter] public CourseDto Course { get; set; } = new CourseDto() { Id = Guid.NewGuid(), StudentsCount = 0, Students = new List<CourseStudentDto>() };
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task AddCourse()
+    {
+        await _coursesClient.AddCourseAsync(Course);
+
+        _snackbar.Add("Der Kurs wurde angelegt", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(Course));
+    }
+}

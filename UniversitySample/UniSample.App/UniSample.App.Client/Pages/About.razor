@@ -1,0 +1,25 @@
+﻿@page "/about"
+
+<PageTitle>UniSample - Über UniSample</PageTitle>
+
+<h1>Über UniSample</h1>
+
+<p>Die Anwendung UniSample dient als Beispiel-Implementierung für die Vorlesung Verteilte Systeme an der DHBW Mannheim.</p>
+
+<p>Hier werden die Claims aufgelistet, die über das Token übermittelt werden.</p>
+
+<AuthorizeView>
+    <Authorized>
+        <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li>
+                    Claim Type: @claim.Type | Claim Value: @claim.Value
+                </li>
+            }
+        </ul>
+    </Authorized>
+    <NotAuthorized>
+        Nicht eingelogged - daher kein Token verfügbar
+    </NotAuthorized>
+</AuthorizeView>

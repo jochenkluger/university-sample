@@ -1,0 +1,14 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Startseite</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/courses/overview" Match="NavLinkMatch.Prefix">Kurse</MudNavLink>
+            <MudNavLink Href="/library/overview" Match="NavLinkMatch.Prefix">Bücherei</MudNavLink>
+            @if(context.User.IsInRole("Administrator"))
+            {
+                <MudNavLink Href="/students/overview" Match="NavLinkMatch.Prefix">Studierende</MudNavLink>
+            }
+        </Authorized>
+    </AuthorizeView>
+    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">Über UniSample</MudNavLink>
+</MudNavMenu>

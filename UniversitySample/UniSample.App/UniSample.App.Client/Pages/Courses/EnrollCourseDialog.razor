@@ -1,0 +1,66 @@
+﻿@attribute [Authorize(Roles = "Student")]
+@using Microsoft.AspNetCore.Authorization
+@using UniSample.App.Services
+@using UniSample.Courses.Domain.Dto
+@inject CoursesClient _coursesClient
+
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            In Kurs einschreiben
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <p>Möchten Sie sich in den folgenden Kurs einschreiben?</p>
+        <MudForm @ref="form">
+            <MudTextField @bind-Value="Course.Id" Label="Id" ReadOnly="true"/>
+            <MudTextField @bind-Value="Course.Name" Label="Name des Kurses" ReadOnly="true"/>
+            <MudTextField @bind-Value="Course.ProfName" Label="Name des Dozenten" ReadOnly="true"/>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" OnClick="Enroll">Einschreiben</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+
+    [Parameter] public CourseDto Course { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Enroll()
+    {
+        var userId = Guid.Parse((await AuthState).User.Claims.FirstOrDefault(x => x.Type == "sub")!.Value);
+        var name = (await AuthState).User.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
+        var courseStudentDto = new CourseStudentDto()
+        {
+            Id = Guid.NewGuid(),
+            CourseId = Course.Id,
+            StudentId = userId,
+            Name = name ?? string.Empty
+        };
+
+        try
+        {
+            await _coursesClient.EnrollCourseAsync(courseStudentDto);
+            _snackbar.Add("Sie wurden in den Kurs eingeschrieben", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(Course));
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add("Fehler beim Einschreiben in den Kurs!", Severity.Error);
+            MudDialog.Close(DialogResult.Cancel());
+        }
+    }
+}

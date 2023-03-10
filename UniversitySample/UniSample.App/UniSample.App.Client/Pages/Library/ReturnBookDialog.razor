@@ -1,0 +1,61 @@
+﻿@attribute [Authorize(Roles = "Student")]
+@using Microsoft.AspNetCore.Authorization
+@using UniSample.App.Services
+@using UniSample.Library.Domain.Contract
+@using UniSample.Library.Domain.Dto
+@inject LibraryClient _libraryClient
+
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Buch zurückgeben
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <p>Möchten Sie folgendes Buch zurückgeben?</p>
+        <MudForm @ref="form">
+            <MudTextField @bind-Value="Book.Isbn" Label="Isbn" ReadOnly="true" />
+            <MudTextField @bind-Value="Book.Title" Label="Titel" ReadOnly="true" />
+            <MudTextField @bind-Value="Book.Author" Label="Autor" ReadOnly="true" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" OnClick="Return">Zurückgeben</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+
+    [Parameter]
+    public BookDto Book { get; set; } = new BookDto();
+    [Parameter]
+    public Guid LendingId { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Return()
+    {
+        var response = await _libraryClient.ReturnBookAsync(LendingId);
+
+        if (response.Success == false)
+        {
+            _snackbar.Add("Fehler beim Zurückgeben des Buches: " + response.Error, Severity.Error);
+            MudDialog.Close(DialogResult.Cancel());
+        }
+        else
+        {
+            _snackbar.Add("Sie haben das Buch zurück gegeben", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(Book));
+        }
+    }
+}

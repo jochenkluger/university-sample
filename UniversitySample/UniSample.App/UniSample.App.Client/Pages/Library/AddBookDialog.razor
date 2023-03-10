@@ -1,0 +1,60 @@
+﻿@attribute [Authorize(Roles = "LibraryAdmin")]
+@using Microsoft.AspNetCore.Authorization
+@using UniSample.App.Services
+@using UniSample.Courses.Domain.Dto
+@using UniSample.Library.Domain.Dto
+@inject LibraryClient _libraryClient
+
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Neues Buch anlegen
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            @if (errors.Length > 0)
+            {
+                <MudText Typo="Typo.subtitle2">@($"Fehler: ({errors.Length})")</MudText>
+                @foreach (var error in errors)
+                {
+                    <MudText Color="@Color.Error">@error</MudText>
+                }
+            }
+
+            <MudTextField @bind-Value="Book.Id" Label="Id" ReadOnly="true" />
+            <MudTextField @bind-Value="Book.Isbn" Label="ISBN" Required="true" RequiredError="Bitte geben Sie eine ISBN für das Buch ein!" ReadOnly="false" />
+            <MudTextField @bind-Value="Book.Title" Label="Titel des Buches" Required="true" RequiredError="Bitte geben Sie einen Titel für das Buch ein!" ReadOnly="false" />
+            <MudTextField @bind-Value="Book.Author" Label="Name des Autors" Required="true" RequiredError="Bitte geben Sie den Namen des Autors ein!" ReadOnly="false" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" Disabled="@(!success)" OnClick="AddBook">Buch hinzufügen</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    [Parameter] public BookDto Book { get; set; } = new BookDto() { Id = Guid.NewGuid(), LendingDtos = new List<LendingDto>(), Available = true};
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task AddBook()
+    {
+        await _libraryClient.AddBookAsync(Book);
+
+        _snackbar.Add("Das Buch wurde angelegt", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(Book));
+    }
+}

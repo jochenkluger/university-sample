@@ -1,0 +1,53 @@
+﻿@using UniSample.App.Client.Services
+@using UniSample.App.Client.Pages.Students
+@inherits LayoutComponentBase
+@inject StudentDataService _studentDataService
+@inject IDialogService _dialogService
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h5" Class="ml-3">Uni Sample</MudText>
+        <MudSpacer />
+        <LoginDisplay Color="Color.Inherit" />
+        @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />*@
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <div class="content-container">
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+        if (_studentDataService.CurrentStudent != null && string.IsNullOrEmpty(_studentDataService.CurrentStudent.Number) == true)
+        {
+            if (authState.User.Claims.Any(x => x.Type == "role" && x.Value == "Student"))
+            {
+                var dialog = _dialogService.Show<AddStudentNumberDialog>("Matrikelnummer angeben");
+                await dialog.Result;
+            }
+        }
+        await base.OnInitializedAsync();
+    }
+
+}

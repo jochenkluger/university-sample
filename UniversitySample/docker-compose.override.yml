@@ -1,0 +1,40 @@
+version: '3.4'
+
+services:
+  unisample.courses.service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Europe/Berlin
+      - ConnectionStrings__Db=Server=db;Port=5432;Database=Uni;User Id=dev;Password=123;
+    ports:
+      - 8082:80
+
+  unisample.library.service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Europe/Berlin
+      - ConnectionStrings__Db=Server=db;Port=5432;Database=Uni;User Id=dev;Password=123;
+    ports:
+      - 8083:80
+
+
+  unisample.students.service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Europe/Berlin
+      - ConnectionStrings__Db=Server=db;Port=5432;Database=Uni;User Id=dev;Password=123;
+    ports:
+      - 8084:80
+
+
+  unisample.app.service:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Europe/Berlin
+    ports:
+      - 8081:80
+

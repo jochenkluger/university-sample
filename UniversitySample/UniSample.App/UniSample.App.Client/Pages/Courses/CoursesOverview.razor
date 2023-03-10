@@ -1,0 +1,161 @@
+﻿@page "/courses/overview"
+@using System.Net.Http.Json
+@using UniSample.App.Services
+@using UniSample.Courses.Domain.Dto
+@inject CoursesClient _coursesClient
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
+
+<PageTitle>UniSample - Kursübersicht</PageTitle>
+
+<h1>Kursübersicht</h1>
+
+@if (_loading == true)
+{
+    <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+}
+else
+{
+    @if (AuthState.Result.User.IsInRole("Administrator"))
+    {
+        <MudButton @onclick="CreateNewCourse">Neuen Kurs anlegen</MudButton>
+    }
+    @if (Elements.Count > 0)
+    {
+        <MudDataGrid T="CourseDto" MultiSelection="true" Items="@Elements" Sortable="true" Filterable="true" QuickFilter="@_quickFilter"
+             Hideable="true" RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Kurse</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <Columns>
+                <SelectColumn T="CourseDto" />
+                <Column T="CourseDto" Field="@nameof(CourseDto.Id)" Title="Id" Sortable="false" Filterable="false" />
+                <Column T="CourseDto" Field="@nameof(CourseDto.Name)" />
+                <Column T="CourseDto" Field="@nameof(CourseDto.ProfName)" Title="Name des Dozenten" />
+                <Column T="CourseDto" Field="@nameof(CourseDto.StudentsCount)" Title="Anzahl Studierende" />
+                <Column T="CourseDto" CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        @if (IsEnrollable(context.Item.Students) == true)
+                        {
+                            <MudButton Size="@Size.Small" OnClick="() => Enroll(context.Item)">Einschreiben</MudButton>
+                        }
+                    </CellTemplate>
+                </Column>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="CourseDto" />
+            </PagerContent>
+        </MudDataGrid>
+    }
+    else
+    {
+        <p>Es sind noch keine Kurse vorhanden</p>
+    }
+}
+
+
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    private List<CourseDto> Elements = new List<CourseDto>();
+    private string _searchString;
+    private bool _loading = true;
+    private Guid _currentUserId;
+    private bool _isStudent = false;
+
+    private List<string> _events = new();
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<CourseDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.ProfName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+        _currentUserId = Guid.Parse((await AuthState).User.Claims.FirstOrDefault(x => x.Type == "sub")!.Value);
+        _isStudent = (await AuthState).User.IsInRole("Student");
+    }
+
+    private async Task LoadData()
+    {
+        _loading = true;
+        try
+        {
+            Elements = await _coursesClient.GetCoursesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            _snackbar.Add("Fehler beim Abruf der Daten: " + ex.Message, Severity.Error);
+        }
+        
+        _loading = false;
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<CourseDto> args)
+    {
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<CourseDto> items)
+    {
+        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+
+    private async Task CreateNewCourse()
+    {
+        var dialog = _dialogService.Show<AddCourseDialog>("Kurs hinzufügen");
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            var dto = result.Data as CourseDto;
+            if (dto != null)
+            {
+                Elements.Add(dto);
+            }
+        }
+    }
+
+    private async Task Enroll(CourseDto courseDto)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Course", courseDto);
+        var dialog = _dialogService.Show<EnrollCourseDialog>("In Kurs einschreiben", parameters);
+        await dialog.Result;
+        await LoadData();
+    }
+
+    private bool IsEnrollable(List<CourseStudentDto> students)
+    {
+        if (_isStudent == false)
+        {
+            return false;
+        }
+
+        if (students.Any(x => x.StudentId == _currentUserId) == true)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+}

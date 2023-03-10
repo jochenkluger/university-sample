@@ -1,0 +1,169 @@
+﻿@page "/library/overview"
+@using System.Net.Http.Json
+@using UniSample.App.Services
+@using UniSample.Library.Domain.Dto
+@inject LibraryClient _libraryClient
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
+
+<PageTitle>UniSample - Bücherei</PageTitle>
+
+<h1>Bücherei</h1>
+
+@if (_loading == true)
+{
+    <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+}
+else
+{
+    @if (AuthState.Result.User.IsInRole("LibraryAdmin"))
+    {
+        <MudButton @onclick="CreateNewBook">Neues Buch anlegen</MudButton>
+    }
+
+    @if (Elements.Count > 0)
+    {
+        <MudDataGrid T="BookDto" MultiSelection="true" Items="@Elements" Sortable="true" Filterable="true" QuickFilter="@_quickFilter"
+             Hideable="true" RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Bücher</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <Columns>
+                <SelectColumn T="BookDto" />
+                <Column T="BookDto" Field="@nameof(BookDto.Isbn)" Title="Id" Sortable="false" Filterable="false" />
+                <Column T="BookDto" Field="@nameof(BookDto.Title)" />
+                <Column T="BookDto" Field="@nameof(BookDto.Author)" Title="Autor" />
+                <Column T="BookDto" Field="@nameof(BookDto.Available)" Title="Verfügbar" />
+                <Column T="BookDto" CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        @if (context.Item.Available == true)
+                        {
+                            <MudButton Size="@Size.Small" OnClick="() => Lend(context.Item)">Buch ausleihen</MudButton>
+                        }
+                        @if (IsLendedByCurentUser(context.Item.LendingDtos))
+                        {
+                            <MudButton Size="@Size.Small" OnClick="() => Return(context.Item)">Buch zurückgeben</MudButton>
+                        }
+                    </CellTemplate>
+                </Column>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="BookDto" />
+            </PagerContent>
+        </MudDataGrid>
+    }
+    else
+    {
+        <p>Es sind noch keine Bücher vorhanden</p>
+    }
+}
+
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    private ICollection<BookDto> Elements = new List<BookDto>();
+    private string _searchString = string.Empty;
+    private Guid _currentUserId;
+    private bool _loading = true;
+
+    private List<string> _events = new();
+
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<BookDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Title.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Author.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Isbn.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var filter = string.IsNullOrWhiteSpace(_searchString) ? "*" : _searchString;
+            Elements = await _libraryClient.GetBooksAsync(filter);
+            _currentUserId = Guid.Parse((await AuthState).User.Claims.FirstOrDefault(x => x.Type == "sub")!.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            _snackbar.Add("Fehler beim Abruf der Daten: "+ ex.Message, Severity.Error);
+        }
+        
+        _loading = false;
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<BookDto> args)
+    {
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<BookDto> items)
+    {
+        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+
+    private async Task CreateNewBook()
+    {
+        var dialog = _dialogService.Show<AddBookDialog>("Buch hinzufügen");
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            var dto = result.Data as BookDto;
+            if (dto != null)
+            {
+                Elements.Add(dto);
+            }
+        }
+    }
+
+    private async Task Lend(BookDto bookDto)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Book", bookDto);
+        var dialog = _dialogService.Show<LendBookDialog>("Buch ausleihen", parameters);
+        await dialog.Result;
+    }
+
+    private async Task Return(BookDto bookDto)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Book", bookDto);
+        var dialog = _dialogService.Show<ReturnBookDialog>("Buch zurückgeben",parameters);
+        await dialog.Result;
+    }
+
+    private bool IsLendedByCurentUser(List<LendingDto> itemLendingDtos)
+    {
+        var actualLending = itemLendingDtos.FirstOrDefault(x => x.ReturnTime == null);
+        if (actualLending == null)
+        {
+            return false;
+        }
+
+        if (actualLending.LibraryUserDto.StudentId == _currentUserId)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+}
